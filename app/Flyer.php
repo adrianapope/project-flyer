@@ -20,6 +20,7 @@ class Flyer extends Model
 		'price',
 		'description',
 	];
+
 	/**
 	* A flyer is composed of many photos.
 	*

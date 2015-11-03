@@ -14,3 +14,7 @@
 Route::get('/', function () {
     return view('pages.home');
 });
+
+Route::resource('flyers', 'FlyersController');
+
+//projectflyer.com/1428-elm-street

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Flyer;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\FlyerRequest;
@@ -42,9 +43,12 @@ public function store(FlyerRequest $request)
 
         // persist the flyer
         // that'll be an array that maps to the columns
-        App\Flyer::create($request->all());
+        Flyer::create($request->all());
+
+        // flash messaging
 
         // redirect to landing page
+        return redirect()->back(); // temporary
     }
 
     /**

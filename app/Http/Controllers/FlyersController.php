@@ -20,6 +20,7 @@ class FlyersController extends Controller
         //
     }
 
+
     /**
      * Show the form for creating a new resource.
      *
@@ -32,13 +33,14 @@ class FlyersController extends Controller
         return view('flyers.create');
     }
 
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  FlyerRequest $request
      * @return Response
      */
-public function store(FlyerRequest $request)
+    public function store(FlyerRequest $request)
     {
         // validate the form
         // this is done through FlyerRequest not here
@@ -49,11 +51,12 @@ public function store(FlyerRequest $request)
 
         // flash messaging
         // session()->flash('flash_message', 'Flyer sucessfully created!');
-        flash('Success', 'Your flyer has been created!');
+        flash()->success('Success', 'Your flyer has been created!');
 
         // redirect to landing page
         return redirect()->back(); // temporary
     }
+
 
     /**
      * Display the specified resource.
@@ -61,10 +64,12 @@ public function store(FlyerRequest $request)
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($zip, $street)
     {
-        //
+        // grabs the first address with a zip of this and street of that
+        return Flyer::locatedAt($zip, $street)->first();
     }
+
 
     /**
      * Show the form for editing the specified resource.
@@ -77,6 +82,7 @@ public function store(FlyerRequest $request)
         //
     }
 
+
     /**
      * Update the specified resource in storage.
      *
@@ -88,6 +94,7 @@ public function store(FlyerRequest $request)
     {
         //
     }
+
 
     /**
      * Remove the specified resource from storage.

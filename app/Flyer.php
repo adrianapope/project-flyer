@@ -22,6 +22,24 @@ class Flyer extends Model
 	];
 
 	/**
+	* Scope query to those located at a given address.
+	*
+	* @param Builder $query
+	* @param string $zip
+	* @param string $street
+	* @return Builder
+	*/
+	public function scopeLocatedAt($query, $zip, $street)
+	{
+		// replace spaces with a dash
+        $street = str_replace('-', ' ', $street);
+
+        // query where zip is this and street is that
+        return $query->where(compact('zip', 'street'));
+    }
+
+
+	/**
 	* A flyer is composed of many photos.
 	*
 	* @return \Illuminate\Database\Eloquent\Relations\HasMany

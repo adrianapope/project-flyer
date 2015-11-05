@@ -39,6 +39,12 @@ class Flyer extends Model
     }
 
 
+    public function getPriceAttribute($price)
+    {
+    	return '$' . number_format($price);
+    }
+
+
 	/**
 	* A flyer is composed of many photos.
 	*

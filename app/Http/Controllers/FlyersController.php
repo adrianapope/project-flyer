@@ -58,6 +58,12 @@ class FlyersController extends Controller
     }
 
 
+    public function addPhoto()
+    {
+        return 'working on it';
+    }
+
+
     /**
      * Display the specified resource.
      *
@@ -67,7 +73,9 @@ class FlyersController extends Controller
     public function show($zip, $street)
     {
         // grabs the first address with a zip of this and street of that
-        return Flyer::locatedAt($zip, $street)->first();
+        $flyer = Flyer::locatedAt($zip, $street)->first();
+
+        return view('flyers.show', compact('flyer'));
     }
 
 

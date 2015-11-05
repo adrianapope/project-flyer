@@ -66,7 +66,6 @@ class Flash {
 	* @param string $level
 	* @return void
 	*/
-	*/
 	public function overlay($title, $message, $level = 'success')
 	{
 		return $this->create($title, $message, $level, 'flash_message_overlay');

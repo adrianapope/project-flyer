@@ -16,5 +16,6 @@ Route::get('/', function () {
 });
 
 Route::resource('flyers', 'FlyersController');
+Route::get('{zip}/{street}', 'FlyersController@show');
 
-//projectflyer.com/1428-elm-street
+//projectflyer.com/90808/5529-east-keynote-street

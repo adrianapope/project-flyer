@@ -27,8 +27,8 @@ class FlyersController extends Controller
      */
     public function create()
     {
-        flash('hello world', 'this is the message.');
-
+/*        flash('hello world', 'this is the message.');
+*/
         return view('flyers.create');
     }
 
@@ -49,7 +49,7 @@ public function store(FlyerRequest $request)
 
         // flash messaging
         // session()->flash('flash_message', 'Flyer sucessfully created!');
-        flash('Flyer sucessfully created!');
+        flash('Success', 'Your flyer has been created!');
 
         // redirect to landing page
         return redirect()->back(); // temporary

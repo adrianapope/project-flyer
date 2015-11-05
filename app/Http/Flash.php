@@ -2,22 +2,81 @@
 
 namespace App\Http;
 
-// rather than hard coding a simple string as the value, we can make it equal to an arary that has the specifics of the flash message
-
 class Flash {
-
-	public function message($title, $message)
+	/**
+	* Create a flash message.
+	*
+	* @param string $title
+	* @param string $message
+	* @param string $level
+	* @param string|null $key
+	* @return void
+	*/
+	public function create($title, $message, $level, $key = 'flash_message')
 	{
-		session()->flash('flash_message', [
+		session()->flash($key, [
 			'title' => $title,
 			'message' => $message,
+			'level' => $level
 		]);
 	}
+
+	/**
+	* Create an information flash message.
+	*
+	* @param string $title
+	* @param string $message
+	* @return void
+	*/
+	public function info($title, $message)
+	{
+		return $this->create($title, $message,  'info');
+	}
+
+	/**
+	* Create a success flash message.
+	*
+	* @param string $title
+	* @param string $message
+	* @return void
+	*/
+	public function success($title, $message)
+	{
+		return $this->create($title, $message,  'success');
+	}
+
+	/**
+	* Create an error flash message.
+	*
+	* @param string $title
+	* @param string $message
+	* @return void
+	*/
+	public function error($title, $message)
+	{
+		return $this->create($title, $message,  'error');
+	}
+
+
+	/**
+	* Create an overlay flash message.
+	*
+	* @param string $title
+	* @param string $message
+	* @param string $level
+	* @return void
+	*/
+	*/
+	public function overlay($title, $message, $level = 'success')
+	{
+		return $this->create($title, $message, $level, 'flash_message_overlay');
+	}
+
 }
 
 
-// store the key here as flash_message
-// the value will be $message
+// key is flash_message
+// value is $message
 
 
 // $flash->message('hello');

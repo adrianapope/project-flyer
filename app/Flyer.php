@@ -2,6 +2,9 @@
 
 namespace App;
 
+use App\Photo;
+
+
 use Illuminate\Database\Eloquent\Model;
 
 class Flyer extends Model
@@ -22,26 +25,40 @@ class Flyer extends Model
 	];
 
 	/**
-	* Scope query to those located at a given address.
+	* Find the flyer at the given address.
 	*
-	* @param Builder $query
 	* @param string $zip
 	* @param string $street
 	* @return Builder
 	*/
-	public function scopeLocatedAt($query, $zip, $street)
+	public static function locatedAt($zip, $street)
 	{
 		// replace spaces with a dash
         $street = str_replace('-', ' ', $street);
 
-        // query where zip is this and street is that
-        return $query->where(compact('zip', 'street'));
+ 		// where clause to search for the flyer with zip and street
+         return static::where(compact('zip', 'street'))->first();
     }
 
-
+	/**
+    * Formats the price for a house.
+    *
+    */
     public function getPriceAttribute($price)
     {
     	return '$' . number_format($price);
+    }
+
+
+    /**
+    * Adds a photo to the flyer.
+    *
+    */
+    public function addPhoto(Photo $photo)
+    {
+    	// reference that relationship and save the photo
+    	// flyer to photos() where photos() is the relationship (see below)
+    	return $this->photos()->save($photo);
     }
 
 

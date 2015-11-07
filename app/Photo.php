@@ -29,7 +29,7 @@ class Photo extends Model
 
 
 	/**
-	* it will accept an uploaded file instance
+	* It will accept an uploaded file instance
 	*
 	*/
     public static function fromForm(UploadedFile $file)

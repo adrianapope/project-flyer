@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Flyer;
+use App\Photo;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\FlyerRequest;
@@ -57,10 +58,63 @@ class FlyersController extends Controller
         return redirect()->back(); // temporary
     }
 
-
-    public function addPhoto()
+    /**
+    * Apply a photo to the referenced flyer.
+    *
+    *
+    * @param string $zip
+    * @param string $street
+    * @param Request $request
+    */
+    public function addPhoto($zip, $street, Request $request)
     {
-        return 'working on it';
+        // quick validation to make sure its a photo
+        // make sure we are getting a photo uploaded by specifying accepted  mime types
+        // require a photo. so that is the require key word
+        // call the validate method on request
+        $this->validate($request, [
+            'photo' => 'required|mimes:jpg,jpeg,png,bmp'
+        ]);
+
+        // how do we grab a photo?
+        // we'll accept the request object
+        // when you are dealing with file uploads you can use the request file method and
+        // then reference the field name. or the paramName. by default its called file. but you can change it.
+        // this will be an instance of the UploadedFile class
+        // there are other methods available throught the UploadedFile class
+        // get the uploaded file instance
+        // $file = ($request->file('file'));
+        // $file = ($request->file('photo'));
+
+        // set up a file name. rename file to something unique with a timetamp before the orignal name
+        // $name = time() . $file->getClientOriginalName();
+
+        // on file instance, there is a move method which you can give it the directory
+        // that you want to move it to as well as the file name that you want to use
+        // we gotta be careful that new photos dont replace existing photos with the same name
+        // so we'll apply some sort of prefix
+        // move the temporary image to its new resting space
+        // $file->move('path', 'file-name');
+        // $file->move('flyers/photos', $name);
+
+        // so if we are going to save a photo, we need a photo instance
+        // we'll use a static constructor where i'm saying i'm building up a new photo
+        // but im getting all the information from a form
+        $photo =  Photo::fromForm($request->file('photo'));
+
+        // find the current flyer
+        // $flyer = Flyer::locatedAt($zip, $street);
+
+        // find current flyer. and add photo to it. we pass in the photo object.
+        Flyer::locatedAt($zip, $street)->addPhoto($photo);
+
+        // we will add a photo to the flyer
+        // reference the relationship and say create a new one
+       /* $flyer->photos()->create([
+            'path' => "/flyers/photos/{$name}"
+        ]);
+*/
+        return 'Done';
     }
 
 
@@ -73,7 +127,7 @@ class FlyersController extends Controller
     public function show($zip, $street)
     {
         // grabs the first address with a zip of this and street of that
-        $flyer = Flyer::locatedAt($zip, $street)->first();
+        $flyer = Flyer::locatedAt($zip, $street);
 
         return view('flyers.show', compact('flyer'));
     }

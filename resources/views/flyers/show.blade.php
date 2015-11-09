@@ -24,7 +24,12 @@
 
 	<h2>Add Your Photos</h2>
 
-	<form id="addPhotosForm" action="/{{ $flyer->zip }}/{{ $flyer->street }}/photos" method="POST" class="dropzone">
+	{{-- <form id="addPhotosForm" action="/{{ $flyer->zip }}/{{ $flyer->street }}/photos" method="POST" class="dropzone"> --}}
+	{{-- uses laravel's route() function to reference a "named route" called store_photo_path and then we just have to send through the zip code and the street. since we have lots of attributes we'll put each one on its line. --}}
+	<form id="addPhotosForm"
+		action="{{ route('store_photo_path', [$flyer->zip, $flyer->street]) }}"
+		method="POST"
+		class="dropzone">
 		{{ csrf_field() }}
 	</form>
 @stop

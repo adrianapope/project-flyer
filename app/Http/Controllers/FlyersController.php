@@ -12,6 +12,17 @@ use App\Http\Controllers\Controller;
 class FlyersController extends Controller
 {
     /**
+     * Authentication. You can't sell your home unless you've created an account first.
+     * reference a piece of middleware called auth
+     * this means you need to be authenticated in order to visit any of the routes connected with these methods
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response

@@ -8,17 +8,18 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Http\Requests\FlyerRequest;
 use App\Http\Controllers\Controller;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
 
 class FlyersController extends Controller
 {
     /**
-     * Authentication. You can't sell your home unless you've created an account first.
-     * reference a piece of middleware called auth
-     * this means you need to be authenticated in order to visit any of the routes connected with these methods
+     * Authentication. You can't create a flyer unless you've created an account first.
+     *
      */
     public function __construct()
     {
-        $this->middleware('auth');
+        $this->middleware('auth', ['except' => ['show']]);
     }
 
 
@@ -29,7 +30,9 @@ class FlyersController extends Controller
      */
     public function index()
     {
-        //
+        /*$flyers = Flyer::all();
+
+        return view('flyers.index', compact('flyers'));*/
     }
 
 
@@ -79,54 +82,31 @@ class FlyersController extends Controller
     */
     public function addPhoto($zip, $street, Request $request)
     {
-        // quick validation to make sure its a photo
-        // make sure we are getting a photo uploaded by specifying accepted  mime types
-        // require a photo. so that is the require key word
-        // call the validate method on request
+        // validate the request
         $this->validate($request, [
             'photo' => 'required|mimes:jpg,jpeg,png,bmp'
         ]);
 
-        // how do we grab a photo?
-        // we'll accept the request object
-        // when you are dealing with file uploads you can use the request file method and
-        // then reference the field name. or the paramName. by default its called file. but you can change it.
-        // this will be an instance of the UploadedFile class
-        // there are other methods available throught the UploadedFile class
-        // get the uploaded file instance
-        // $file = ($request->file('file'));
-        // $file = ($request->file('photo'));
+        // make a new photo and pass through an uploaded file instance.
+        $photo = $this->makePhoto($request->file('photo'));
 
-        // set up a file name. rename file to something unique with a timetamp before the orignal name
-        // $name = time() . $file->getClientOriginalName();
-
-        // on file instance, there is a move method which you can give it the directory
-        // that you want to move it to as well as the file name that you want to use
-        // we gotta be careful that new photos dont replace existing photos with the same name
-        // so we'll apply some sort of prefix
-        // move the temporary image to its new resting space
-        // $file->move('path', 'file-name');
-        // $file->move('flyers/photos', $name);
-
-        // so if we are going to save a photo, we need a photo instance
-        // we'll use a static constructor where i'm saying i'm building up a new photo
-        // but im getting all the information from a form
-        $photo =  Photo::fromForm($request->file('photo'));
-
-        // find the current flyer
-        // $flyer = Flyer::locatedAt($zip, $street);
-
-        // find current flyer. and add photo to it. we pass in the photo object.
+        // associate it with this flyer and save it.
         Flyer::locatedAt($zip, $street)->addPhoto($photo);
-
-        // we will add a photo to the flyer
-        // reference the relationship and say create a new one
-       /* $flyer->photos()->create([
-            'path' => "/flyers/photos/{$name}"
-        ]);
-*/
-        return 'Done';
     }
+
+
+    /**
+     * Give me a new photo object with the current name that we give you and move it to its resting spot in our file system.
+     * There is a move() method which moves the photo to the baseDir and then we apply the proper name. Next we create the thumbnail.
+     *
+     */
+   public function makePhoto(UploadedFile $file)
+   {
+        // return Photo::named($file)->store($file);
+
+        return Photo::named($file->getClientOriginalName())
+            ->move($file);
+   }
 
 
     /**

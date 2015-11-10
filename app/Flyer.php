@@ -3,8 +3,7 @@
 namespace App;
 
 use App\Photo;
-
-
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Model;
 
 class Flyer extends Model
@@ -36,8 +35,8 @@ class Flyer extends Model
 		// replace spaces with a dash
         $street = str_replace('-', ' ', $street);
 
- 		// where clause to search for the flyer with zip and street
-         return static::where(compact('zip', 'street'))->first();
+		// where clause to search for the flyer with zip and street
+        return static::where(compact('zip', 'street'))->firstOrFail();
     }
 
 	/**

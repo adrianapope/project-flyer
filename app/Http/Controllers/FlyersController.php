@@ -82,21 +82,22 @@ class FlyersController extends Controller
 
     /**
     * Apply a photo to the referenced flyer.
-    *
+    * Uses a dedicated form request called ChangeFlyerRequest.
+    * Import the request class up top.
     *
     * @param string $zip
     * @param string $street
-    * @param Request $request
+    * @param ChangeFlyerRequest $request
     */
     public function addPhoto($zip, $street, ChangeFlyerRequest $request)
     {
-        // validate the request
+        // for trait option we need to import trait class up top and declare trait
+        // we would extract methods userCreatedFlyer & unauthorized() to a trait
         // $this->validate($request, [
-        //     'photo' => 'required|mimes:jpg,jpeg,png,bmp'
+        //     'photo' => 'required|mime:jpg,jpeg,png,bmp'
         // ]);
 
-        // // if user the user didn't create the flyer then return with an unauthorized request
-        // if (! $this->userCreatedFlyer()) {
+        // if (! $this->userCreatedFlyer($request)) {
         //     return $this->unauthorized($request);
         // }
 
@@ -106,6 +107,19 @@ class FlyersController extends Controller
         // located the current flyer. associate it with this flyer and save it.
         Flyer::locatedAt($zip, $street)->addPhoto($photo);
     }
+
+    /**
+    * Put this in the ChangeFlyerRequest.
+    * Performs a check to see if user created a particular flyer with this criteria.
+    */
+    // protected function userCreatedFlyer(Request $request)
+    // {
+    //     return Flyer::where([
+    //         'zip' => $request->zip,
+    //         'street' => $request->street,
+    //         'user_id' => $this->user->id  // same as Auth::user()->id
+    //     ])->exists();
+    // }
 
 
     /**

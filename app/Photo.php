@@ -15,7 +15,7 @@ class Photo extends Model
 	protected $fillable = ['path', 'name', 'thumbnail_path'];
 
 	// default base path for all of our photos
-	protected $baseDir = 'flyers/photos';
+	protected $baseDir = 'images/photos';
 
 
 	/**

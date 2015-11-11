@@ -28,6 +28,16 @@
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
         </ul>
+
+{{--         @if (Auth::check())
+--}}
+        @if ($signedIn)
+          <p class="navbar-text navbar-right">
+{{--             Hello, {{ Auth::user()->name }}
+--}}
+            Hello, {{ $user->name }}
+          </p>
+        @endif
       </div><!--/.nav-collapse -->
     </div>
   </nav>

@@ -4,15 +4,20 @@ namespace App\Http\Controllers;
 
 use App\Flyer;
 use App\Photo;
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Http\Requests\FlyerRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\FlyerRequest;
+// use App\Http\Controllers\Traits\AuthorizesUsers;
+use App\Http\Requests\ChangeFlyerRequest;
+use App\Http\Requests;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 
 class FlyersController extends Controller
 {
+    // use AuthorizesUsers;
+
+
     /**
      * Authentication. You can't create a flyer unless you've created an account first.
      *
@@ -20,6 +25,9 @@ class FlyersController extends Controller
     public function __construct()
     {
         $this->middleware('auth', ['except' => ['show']]);
+
+        // "delegate up" since we have a constructor in our abstract Controller class as well
+        parent::__construct();
     }
 
 
@@ -43,7 +51,7 @@ class FlyersController extends Controller
      */
     public function create()
     {
-        flash()->overlay('Welcome Aboard!', 'Thank you for signing up.');
+        //flash()->overlay('Welcome Aboard!', 'Thank you for signing up.');
 
         return view('flyers.create');
     }
@@ -66,7 +74,7 @@ class FlyersController extends Controller
 
         // flash messaging
         // session()->flash('flash_message', 'Flyer sucessfully created!');
-        flash()->success('Success', 'Your flyer has been created!');
+        // flash()->success('Success', 'Your flyer has been created!');
 
         // redirect to landing page
         return redirect()->back(); // temporary
@@ -80,17 +88,22 @@ class FlyersController extends Controller
     * @param string $street
     * @param Request $request
     */
-    public function addPhoto($zip, $street, Request $request)
+    public function addPhoto($zip, $street, ChangeFlyerRequest $request)
     {
         // validate the request
-        $this->validate($request, [
-            'photo' => 'required|mimes:jpg,jpeg,png,bmp'
-        ]);
+        // $this->validate($request, [
+        //     'photo' => 'required|mimes:jpg,jpeg,png,bmp'
+        // ]);
 
-        // make a new photo and pass through an uploaded file instance.
+        // // if user the user didn't create the flyer then return with an unauthorized request
+        // if (! $this->userCreatedFlyer()) {
+        //     return $this->unauthorized($request);
+        // }
+
+        // if they pass guard, then make a new photo and pass through an uploaded file instance.
         $photo = $this->makePhoto($request->file('photo'));
 
-        // associate it with this flyer and save it.
+        // located the current flyer. associate it with this flyer and save it.
         Flyer::locatedAt($zip, $street)->addPhoto($photo);
     }
 

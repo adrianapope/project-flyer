@@ -14,6 +14,11 @@ abstract class Controller extends BaseController
 
     protected $user;
 
+    /**
+    * Every view has a variable called $user and $signIn which might be useful.
+	* These will be applicable to any controller.
+	*
+	*/
     public function __construct()
     {
     	// declare this equals that

@@ -102,7 +102,12 @@ class FlyersController extends Controller
         // }
 
         // if they pass guard, then make a new photo and pass through an uploaded file instance.
-        $photo = $this->makePhoto($request->file('photo'));
+        // $photo = $this->makePhoto($request->file('photo'));
+
+        // i like using a named constructor. that way i can new up a photo and pass in the columns essentially
+        // or if i wanted to fetch these from (in this case) a file's request then its useful to use a named construcor.
+        // we'll pass in the photo uploaded file.
+        $photo = Photo::fromFile($request->file('photo'));
 
         // located the current flyer. associate it with this flyer and save it.
         Flyer::locatedAt($zip, $street)->addPhoto($photo);
@@ -127,13 +132,13 @@ class FlyersController extends Controller
      * There is a move() method which moves the photo to the baseDir and then we apply the proper name. Next we create the thumbnail.
      *
      */
-   public function makePhoto(UploadedFile $file)
-   {
-        // return Photo::named($file)->store($file);
+   // public function makePhoto(UploadedFile $file)
+   // {
+   //      // return Photo::named($file)->store($file);
 
-        return Photo::named($file->getClientOriginalName())
-            ->move($file);
-   }
+   //      return Photo::named($file->getClientOriginalName())
+   //          ->move($file);
+   // }
 
 
     /**

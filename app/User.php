@@ -45,6 +45,17 @@ class User extends Model implements AuthenticatableContract,
     {
         return $this->hasMany('App\Flyer');
     }
+
+
+    /**
+    * It accepts some sort of relation.
+    * Just make sure that the user id equals the current id of the user.
+    *
+    */
+    public function owns($relation)
+    {
+        return $relation->user_id == $this->id;
+    }
 }
 
 

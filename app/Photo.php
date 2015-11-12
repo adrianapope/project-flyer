@@ -10,11 +10,24 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 class Photo extends Model
 
 {
+    /**
+    *
+    */
+    protected $file;
+
+    /**
+    * Photos of our flyers.
+    */
 	protected $table = 'flyer_photos';
 
+    /**
+    * Fillable fields for a photo.
+    */
 	protected $fillable = ['path', 'name', 'thumbnail_path'];
 
-	// default base path for all of our photos
+    /**
+    * The default base path where all of our photos are stored.
+    */
 	protected $baseDir = 'images/photos';
 
 
@@ -26,6 +39,41 @@ class Photo extends Model
     public function flyer()
     {
     	return $this->belongsTo('App\Flyer');
+    }
+
+
+    public static function fromFile(Uploaded $file)
+    {
+        // new up an instance
+        $photo = new static;
+
+        // we will assign the uploaded file to the object
+        $photo->file = $file;
+
+        // since this is a substitute for a constuctor, i'm going to fill the necessary columns.
+        // instead of using saveAs method, we will just defer to separate methods and create each one.
+        $photo->file([
+            'name' => $photo->fileName();
+            'path' => $path->
+            'thumbnail_path' => $thumbnail_path
+        ]);
+    }
+
+
+    /**
+    * Get file's original name and format however we want.
+    * run it through sha1(). then merge the current time with the file name and then encrypt that.
+    * and then get the extension. and then merge those together.
+    */
+    public function fileName()
+    {
+        $name = sha1(
+            time() . $this->file->getClientOriginalName()
+        );
+
+        $extension = $this->file->getClientOriginalExtension();
+
+        return "{$name}.{$extenstion}";
     }
 
 
@@ -49,19 +97,19 @@ class Photo extends Model
     * Set the proper columns such as name, path and thumbnail_path.
     *
     */
-    public function saveAs($name)
-    {
-        // name of the file   12334556777RedHouse.jpg
-        $this->name = sprintf("%s-%s", time(), $name);
+    // public function saveAs($name)
+    // {
+    //     // name of the file   12334556777RedHouse.jpg
+    //     $this->name = sprintf("%s-%s", time(), $name);
 
-        // name of the path   flyers/photos/2342344GreenHouse.jpg
-        $this->path = sprintf("%s/%s", $this->baseDir, $this->name);
+    //     // name of the path   flyers/photos/2342344GreenHouse.jpg
+    //     $this->path = sprintf("%s/%s", $this->baseDir, $this->name);
 
-        // name of the thumbnail   flyers/photos/tn-123434555BlueHouse.jpg
-        $this->thumbnail_path = sprintf("%s/tn-%s", $this->baseDir, $this->name);
+    //     // name of the thumbnail   flyers/photos/tn-123434555BlueHouse.jpg
+    //     $this->thumbnail_path = sprintf("%s/tn-%s", $this->baseDir, $this->name);
 
-        return $this;
-    }
+    //     return $this;
+    // }
 
     /**
     * Move the file to the baseDir and the name we gave it. And calls makeThumbnail method.

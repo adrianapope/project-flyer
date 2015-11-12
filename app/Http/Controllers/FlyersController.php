@@ -6,18 +6,13 @@ use App\Flyer;
 use App\Photo;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FlyerRequest;
-// use App\Http\Controllers\Traits\AuthorizesUsers;
-use App\Http\Requests\ChangeFlyerRequest;
+use App\Http\Requests\AddPhotoRequest;
 use App\Http\Requests;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 
 class FlyersController extends Controller
 {
-    // use AuthorizesUsers;
-
-
     /**
      * Authentication. You can't create a flyer unless you've created an account first.
      *
@@ -67,14 +62,13 @@ class FlyersController extends Controller
     {
         // validate the form
         // this is done through FlyerRequest not here
-
         // persist the flyer
         // that'll be an array that maps to the columns
         Flyer::create($request->all());
 
         // flash messaging
         // session()->flash('flash_message', 'Flyer sucessfully created!');
-        // flash()->success('Success', 'Your flyer has been created!');
+        flash()->success('Success', 'Your flyer has been created!');
 
         // redirect to landing page
         return redirect()->back(); // temporary
@@ -82,63 +76,27 @@ class FlyersController extends Controller
 
     /**
     * Apply a photo to the referenced flyer.
-    * Uses a dedicated form request called ChangeFlyerRequest.
-    * Import the request class up top.
+    * Uses a dedicated form request called AddPhotoRequest.
     *
     * @param string $zip
     * @param string $street
-    * @param ChangeFlyerRequest $request
+    * @param AddPhotoRequest $request
     */
-    public function addPhoto($zip, $street, ChangeFlyerRequest $request)
+    public function addPhoto($zip, $street, AddPhotoRequest $request)
     {
-        // for trait option we need to import trait class up top and declare trait
-        // we would extract methods userCreatedFlyer & unauthorized() to a trait
-        // $this->validate($request, [
-        //     'photo' => 'required|mime:jpg,jpeg,png,bmp'
-        // ]);
-
-        // if (! $this->userCreatedFlyer($request)) {
-        //     return $this->unauthorized($request);
-        // }
-
-        // if they pass guard, then make a new photo and pass through an uploaded file instance.
-        // $photo = $this->makePhoto($request->file('photo'));
-
         // i like using a named constructor. that way i can new up a photo and pass in the columns essentially
         // or if i wanted to fetch these from (in this case) a file's request then its useful to use a named construcor.
         // we'll pass in the photo uploaded file.
+        // built up our photo
+        // $photo = Photo::fromFile($request->file('photo'))->upload();
         $photo = Photo::fromFile($request->file('photo'));
 
+        // then we pass the photo to our flyer
+        // But what about the process where we upload the file to the proper directory?
+        // yes we persist it in the database. but we also need to move it to the folder and create the thumbnail.
         // located the current flyer. associate it with this flyer and save it.
         Flyer::locatedAt($zip, $street)->addPhoto($photo);
     }
-
-    /**
-    * Put this in the ChangeFlyerRequest.
-    * Performs a check to see if user created a particular flyer with this criteria.
-    */
-    // protected function userCreatedFlyer(Request $request)
-    // {
-    //     return Flyer::where([
-    //         'zip' => $request->zip,
-    //         'street' => $request->street,
-    //         'user_id' => $this->user->id  // same as Auth::user()->id
-    //     ])->exists();
-    // }
-
-
-    /**
-     * Give me a new photo object with the current name that we give you and move it to its resting spot in our file system.
-     * There is a move() method which moves the photo to the baseDir and then we apply the proper name. Next we create the thumbnail.
-     *
-     */
-   // public function makePhoto(UploadedFile $file)
-   // {
-   //      // return Photo::named($file)->store($file);
-
-   //      return Photo::named($file->getClientOriginalName())
-   //          ->move($file);
-   // }
 
 
     /**

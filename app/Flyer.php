@@ -55,7 +55,7 @@ class Flyer extends Model
     */
     public function addPhoto(Photo $photo)
     {
-    	// reference that relationship and save the photo
+    	// reference that relationship and save the photo (last part of the process).
     	// flyer to photos() where photos() is the relationship (see below)
     	return $this->photos()->save($photo);
     }

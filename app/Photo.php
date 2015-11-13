@@ -24,34 +24,6 @@ class Photo extends Model
     */
 	protected $fillable = ['path', 'name', 'thumbnail_path'];
 
-    /**
-    * The UploadedFile instance.
-    *
-    * @var UploadedFile
-    */
-    protected $file;
-
-
-    /**
-    * When a photo is created, prepare a thumbnail, too using upload().
-    * @return void
-    * Register a creating model event with the dispatcher.
-    * When we are booting this model, do we need to do anything?
-    * yes, we'll add an eloquent event listener.
-    * when you are in the process of creating a new photo, getting ready to persist it,
-    * and you are saying i am about to save this new photo, does anyone want me to do anything? does anyone want to stop me?
-    * yeah, when you are ready to save a photo i want to interject at that point and just upload the file.
-    * so i can call photo upload here rather than from our controller.
-    * the way that it works is that if you return a falsey value from this closure, then it assumes
-    * something went wrong and the photo will not be persisited. that's how we can handle that.
-    */
-    protected static function boot()
-    {
-        static::creating(function ($photo) {
-            return $photo->upload(); // this is what we are actually passing through. if it doesn't pass then photo is not going to move/save
-        });
-    }
-
 
 	/**
 	* A photo belongs to a flyer.
@@ -65,66 +37,6 @@ class Photo extends Model
 
 
     /**
-    * Make a new photo instance from an uploaded file.
-    * Static constructor which creates a photo instance, sets it to $file and fills it up with the necessary properties.
-    *
-    * @param UploadedFile $file
-    * @return self
-    */
-    public static function fromFile(UploadedFile $file)
-    {
-        // new up a photo instance
-        $photo = new static;
-
-        // set the file instance. we will assign the uploaded file to the object
-        // $file has all these methods attached to it becuase of the request (See below)
-        $photo->file = $file;
-
-        // fil the necessary properties or columns on the model Photo
-        // since this is a substitute for a constuctor, i'm going to fill the necessary columns.
-        // instead of using saveAs method, we will just defer to separate methods and create each one.
-        // $file is the uploaded file. while $photo refers to the model
-        // return the instance
-        return $photo->fill([
-            'name'              => $photo->fileName(),
-            'path'              => $photo->filePath(),
-            'thumbnail_path'    => $photo->thumbnailPath()
-        ]);
-    }
-
-
-    /**
-    * Get the file name for the photo.
-    * @return string
-    * Produce a fileName with timestamp + original name + extension.
-    * and now we can delegate to the uploaded file and get the client original name
-    * now we can format the file however we want.
-    * run it through sha1() encryption method. then merge the current time with the file name and then encrypt that.
-    * so that would be our name
-    * and then we need to get the extension. and we just merge those together to produce a finished fileName
-    */
-    public function fileName()
-    {
-        $name = sha1(
-            time() . $this->file->getClientOriginalName()
-        );
-
-        $extension = $this->file->getClientOriginalExtension();
-
-        return "{$name}.{$extension}";
-    }
-
-    /**
-    * Get the path to the photo.
-    *
-    * @return string
-    */
-    public function filePath()
-    {
-        return $this->baseDir() . '/'. $this->fileName();
-    }
-
-    /**
     * Get the base directory for photo uploads.
     * Defualt directory path where the photos are stored (public/images/photos) folder.
     * baseDir use to be a property and that's good if it needs to be configurable.
@@ -135,43 +47,24 @@ class Photo extends Model
         return 'images/photos';
     }
 
-   /**
-    * Get the path to the photo's thumbnail.
-    *
-    * @return string
-    */
-    public function thumbnailPath()
-    {
-        return $this->baseDir() . '/tn-' . $this->filename();
-    }
-
-
     /**
-    * Move the photo to the proper folder.
-    * Move the file to the baseDir and the name we gave it. And calls makeThumbnail method.
-    * Delegate to the file instance on the object object to move it to the baseDir and the file name.
+    * use a mutator here.
+    * Anytime you set the filename we update the path and thumbnail path
+    * We will update the internal attributes array.
+    * and any time we say $photo->name = 'new.jpg';
+    * well we are going to decide that we want to automatically update the path and thumbnail_path as well since they are connected
+    * the naming should be the same! if that is appropriate i can do it here.
     *
-    * @return self
     */
-    public function upload()
+    public function setNameAttribute($name)
     {
-        $this->file->move($this->baseDir(), $this->fileName());
+        // update the internal attributes array
+        $this->attributes['name'] = $name;
 
-        $this->makeThumbnail();
+        // update the path
+        $this->path = $this->baseDir() .'/'. $name;
 
-        return $this;
-    }
-
-
-    /**
-    * Create a thumbnail for the photo.
-    *
-    * @return void
-    */
-    public function makeThumbnail()
-    {
-        Image::make($this->filePath())
-            ->fit(200)
-            ->save($this->thumbnailPath());
+        // update the thumbnail_path
+        $this->thumbnail_path = $this->baseDir() .'/tn-'. $name;
     }
 }

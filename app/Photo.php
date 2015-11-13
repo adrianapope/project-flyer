@@ -35,19 +35,20 @@ class Photo extends Model
     /**
     * When a photo is created, prepare a thumbnail, too using upload().
     * @return void
+    * Register a creating model event with the dispatcher.
     * When we are booting this model, do we need to do anything?
     * yes, we'll add an eloquent event listener.
     * when you are in the process of creating a new photo, getting ready to persist it,
     * and you are saying i am about to save this new photo, does anyone want me to do anything? does anyone want to stop me?
     * yeah, when you are ready to save a photo i want to interject at that point and just upload the file.
     * so i can call photo upload here rather than from our controller.
-    * the way that it works is that if you return a falsey value from this closure, the it assumes
+    * the way that it works is that if you return a falsey value from this closure, then it assumes
     * something went wrong and the photo will not be persisited. that's how we can handle that.
     */
     protected static function boot()
     {
         static::creating(function ($photo) {
-            return $photo->upload();
+            return $photo->upload(); // this is what we are actually passing through. if it doesn't pass then photo is not going to move/save
         });
     }
 
@@ -70,18 +71,19 @@ class Photo extends Model
     * @param UploadedFile $file
     * @return self
     */
-
     public static function fromFile(UploadedFile $file)
     {
         // new up a photo instance
         $photo = new static;
 
         // set the file instance. we will assign the uploaded file to the object
+        // $file has all these methods attached to it becuase of the request (See below)
         $photo->file = $file;
 
         // fil the necessary properties or columns on the model Photo
         // since this is a substitute for a constuctor, i'm going to fill the necessary columns.
         // instead of using saveAs method, we will just defer to separate methods and create each one.
+        // $file is the uploaded file. while $photo refers to the model
         // return the instance
         return $photo->fill([
             'name'              => $photo->fileName(),

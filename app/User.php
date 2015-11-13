@@ -37,6 +37,18 @@ class User extends Model implements AuthenticatableContract,
      */
     protected $hidden = ['password', 'remember_token'];
 
+
+    /**
+    * It accepts some sort of relation.
+    * Just make sure that the user id equals the current id of the user.
+    *
+    */
+    public function owns($relation)
+    {
+        return $relation->user_id == $this->id;
+    }
+
+
     /**
     * A user can have many flyers.
     *
@@ -48,13 +60,12 @@ class User extends Model implements AuthenticatableContract,
 
 
     /**
-    * It accepts some sort of relation.
-    * Just make sure that the user id equals the current id of the user.
-    *
+    * Automatically assign the user_id when its saving.
+    * References the relationship between user and flyers (see above) and then saves the flyer.
     */
-    public function owns($relation)
+    public function publish(Flyer $flyer)
     {
-        return $relation->user_id == $this->id;
+        return $this->flyers()->save($flyer);
     }
 }
 

@@ -6,7 +6,6 @@ use App\Flyer;
 use App\Photo;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\FlyerRequest;
-use App\Http\Requests\AddPhotoRequest;
 use App\Http\Requests;
 use Illuminate\Http\Request;
 
@@ -64,38 +63,43 @@ class FlyersController extends Controller
         // this is done through FlyerRequest not here
         // persist the flyer
         // that'll be an array that maps to the columns
-        Flyer::create($request->all());
+        //Flyer::create($request->all());
+
+        // need to link the user to the flyer
+        // get my currently authenticated user and i want them to publish a new flyer
+        $flyer = $this->user->publish(
+            new Flyer($request->all())
+        );
 
         // flash messaging
         // session()->flash('flash_message', 'Flyer sucessfully created!');
-        flash()->success('Success', 'Your flyer has been created!');
+        flash()->success('Success!', 'Your flyer has been created.');
 
-        // redirect to landing page
-        return redirect()->back(); // temporary
-    }
+        // goal: we need to redirect to the completed flyer where they can add photos
+        // we want to send them to /$flyer->zip/$flyer->street
+        // option 1
+        // return redirect($flyer->zip . '/'. str_replace(' ', '-', $flyer->street));
 
-    /**
-    * Apply a photo to the referenced flyer.
-    * Uses a dedicated form request called AddPhotoRequest.
-    *
-    * @param string $zip
-    * @param string $street
-    * @param AddPhotoRequest $request
-    */
-    public function addPhoto($zip, $street, AddPhotoRequest $request)
-    {
-        // i like using a named constructor. that way i can new up a photo and pass in the columns essentially
-        // or if i wanted to fetch these from (in this case) a file's request then its useful to use a named construcor.
-        // we'll pass in the photo uploaded file.
-        // built up our photo
-        // $photo = Photo::fromFile($request->file('photo'))->upload();
-        $photo = Photo::fromFile($request->file('photo'));
+        // option 2 create a named route and then we would pass in whats necessary
+        // return redirect()->route('flyer_path', [$flyer->zip, $flyer->street]);
 
-        // then we pass the photo to our flyer
-        // But what about the process where we upload the file to the proper directory?
-        // yes we persist it in the database. but we also need to move it to the folder and create the thumbnail.
-        // located the current flyer. associate it with this flyer and save it.
-        Flyer::locatedAt($zip, $street)->addPhoto($photo);
+        // option 3 NOT RECOMMENDED! add a method directly onto your flyer model.
+        // technically probably something you shouldn't do and not the best practice.
+        // so in flyer.php we woudld do
+        // public function path()
+        // {
+        //     return redirect($this->zip . '/'. str_replace(' ', '-', $this->street));
+
+        // }
+        // and then one benefit is in the flyersController we can now say redirect to the flyer path
+        // and the flyer model would be responsible for what its companion uri would be
+        // return redirect($flyer->path());
+        // option 4, you can always create little helper functions and this can be useful
+        // you could say redirect to the flyer path and then you would pass in the flyer here
+        // and if that is something you woudl reference throughout this entire project like you are always
+        // linking to a particular file then this would be very helpful
+        // we autoload a app/helpers.php file in our "files" portion of the composer.json
+        return redirect(flyer_path($flyer));
     }
 
 

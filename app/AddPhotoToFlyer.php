@@ -66,7 +66,6 @@ class AddPhotoToFlyer {
 	*/
 	public function save()
 	{
-		// add the photo
 		// attach the photo to the flyer
 		// we call this addPhoto() method that the Flyer model already has
 		// this method save and assigns the flyer_id in the process
@@ -105,7 +104,7 @@ class AddPhotoToFlyer {
 		return new Photo(['name' => $this->makeFilename()]);
 	}
 
-	// Produce a fileName with timestamp + original name + extension.
+	// Produce a file name with timestamp + original name + extension.
   	// and now we can delegate to the uploaded file and get the client original name
     // now we can format the file however we want.
     // run it through sha1() encryption method. then merge the current time with the file name and then encrypt that.
